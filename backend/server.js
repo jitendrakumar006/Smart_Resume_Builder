@@ -17,7 +17,16 @@ const resumeRoutes = require('./routes/resumeRoutes');
 const app = express();
 
 // Middleware
-app.use(cors());
+// CORS configuration - allows frontend to make API requests
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production' 
+    ? process.env.FRONTEND_URL || '*' 
+    : ['http://localhost:3000', 'http://localhost:5000'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+app.use(cors(corsOptions));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
@@ -43,9 +52,20 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'Server is running', timestamp: new Date() });
 });
 
-// 404 Route
-app.use((req, res) => {
-  res.status(404).json({ message: 'Route not found' });
+// Serve React build files (static files) in production
+const frontendBuildPath = path.join(__dirname, '../frontend/build');
+if (process.env.NODE_ENV === 'production' || process.env.SERVE_FRONTEND === 'true') {
+  app.use(express.static(frontendBuildPath));
+  
+  // Handle React Router - all non-API routes go to index.html
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(frontendBuildPath, 'index.html'));
+  });
+}
+
+// API 404 Route (only for /api routes)
+app.get('/api/*', (req, res) => {
+  res.status(404).json({ message: 'API Route not found' });
 });
 
 // Error handling middleware
