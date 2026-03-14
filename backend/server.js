@@ -9,9 +9,21 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const path = require('path');
 
-// Import routes
-const authRoutes = require('./routes/authRoutes');
-const resumeRoutes = require('./routes/resumeRoutes');
+// ✅ Verify critical environment variables
+if (!process.env.JWT_SECRET) {
+  console.warn('⚠️ WARNING: JWT_SECRET not set! Using fallback.');
+  process.env.JWT_SECRET = 'fallback-secret-key-for-development-only';
+}
+
+if (!process.env.JWT_EXPIRE) {
+  console.warn('⚠️ WARNING: JWT_EXPIRE not set! Using fallback.');
+  process.env.JWT_EXPIRE = '7d';
+}
+
+if (!process.env.MONGODB_URI) {
+  console.error('❌ CRITICAL: MONGODB_URI not set!');
+  process.exit(1);
+}
 
 // Initialize Express app
 const app = express();
@@ -49,7 +61,13 @@ app.use('/api/resume', resumeRoutes);
 
 // Health Check Route
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'Server is running', timestamp: new Date() });
+  res.json({ 
+    status: 'Server is running', 
+    timestamp: new Date(),
+    mongodb: mongoose.connection.readyState === 1 ? 'Connected ✅' : 'Disconnected ❌',
+    environment: process.env.NODE_ENV || 'unknown',
+    jwtConfigured: !!process.env.JWT_SECRET ? 'Yes ✅' : 'Missing ❌'
+  });
 });
 
 // Serve React build files (static files) in production
