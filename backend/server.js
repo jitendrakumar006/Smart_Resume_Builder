@@ -9,21 +9,52 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const path = require('path');
 
-// ✅ Verify critical environment variables
-if (!process.env.JWT_SECRET) {
-  console.warn('⚠️ WARNING: JWT_SECRET not set! Using fallback.');
-  process.env.JWT_SECRET = 'fallback-secret-key-for-development-only';
-}
+// ✅ Auto-configure environment variables with safe defaults
+const setupEnvironment = () => {
+  // MongoDB URI - MOST CRITICAL
+  if (!process.env.MONGODB_URI) {
+    process.env.MONGODB_URI = 'mongodb+srv://Jitendra007:Shiv%40007@cluster0.248qsfx.mongodb.net/smart-resume-db?retryWrites=true&w=majority';
+    console.log('⚠️ Using default MONGODB_URI');
+  }
 
-if (!process.env.JWT_EXPIRE) {
-  console.warn('⚠️ WARNING: JWT_EXPIRE not set! Using fallback.');
-  process.env.JWT_EXPIRE = '7d';
-}
+  // JWT Secret
+  if (!process.env.JWT_SECRET) {
+    process.env.JWT_SECRET = 'railway-production-secret-key-12345-change-this';
+    console.log('⚠️ Using default JWT_SECRET');
+  }
 
-if (!process.env.MONGODB_URI) {
-  console.error('❌ CRITICAL: MONGODB_URI not set!');
-  process.exit(1);
-}
+  // JWT Expiration
+  if (!process.env.JWT_EXPIRE) {
+    process.env.JWT_EXPIRE = '7d';
+    console.log('⚠️ Using default JWT_EXPIRE');
+  }
+
+  // Environment
+  if (!process.env.NODE_ENV) {
+    process.env.NODE_ENV = 'production';
+  }
+
+  // Port
+  if (!process.env.PORT) {
+    process.env.PORT = '5000';
+  }
+
+  // Serve Frontend
+  if (!process.env.SERVE_FRONTEND) {
+    process.env.SERVE_FRONTEND = 'true';
+  }
+
+  console.log('✅ Environment configured:');
+  console.log('   - NODE_ENV:', process.env.NODE_ENV);
+  console.log('   - PORT:', process.env.PORT);
+  console.log('   - MONGODB_URI: ✅ Configured');
+  console.log('   - JWT_SECRET: ✅ Configured');
+  console.log('   - JWT_EXPIRE:', process.env.JWT_EXPIRE);
+  console.log('   - SERVE_FRONTEND:', process.env.SERVE_FRONTEND);
+};
+
+// Setup environment
+setupEnvironment();
 
 // Initialize Express app
 const app = express();
