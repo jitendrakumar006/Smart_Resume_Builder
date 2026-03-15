@@ -34,18 +34,10 @@ const setupEnvironment = () => {
     process.env.NODE_ENV = 'development';
   }
 
-  // Port - Convert to integer
+  // Port - Let Railway assign PORT automatically
+  // Don't override it with environment variable
   if (!process.env.PORT) {
-    process.env.PORT = '5000';
-  } else {
-    // Ensure PORT is a valid integer
-    const port = parseInt(process.env.PORT, 10);
-    if (isNaN(port) || port < 0 || port > 65535) {
-      console.warn('⚠️ Invalid PORT:', process.env.PORT, '- Using 5000');
-      process.env.PORT = '5000';
-    } else {
-      process.env.PORT = port.toString();
-    }
+    process.env.PORT = '5000';  // Only for local development
   }
 
   // Serve Frontend
