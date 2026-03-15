@@ -9,7 +9,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const path = require('path');
 
-// ✅ Auto-configure environment variables with safe defaults
+// Setup environment FIRST
 const setupEnvironment = () => {
   // MongoDB URI - MOST CRITICAL
   if (!process.env.MONGODB_URI) {
@@ -53,8 +53,11 @@ const setupEnvironment = () => {
   console.log('   - SERVE_FRONTEND:', process.env.SERVE_FRONTEND);
 };
 
-// Setup environment
 setupEnvironment();
+
+// ✅ Import routes AFTER environment is setup
+const authRoutes = require('./routes/authRoutes');
+const resumeRoutes = require('./routes/resumeRoutes');
 
 // Initialize Express app
 const app = express();
