@@ -11,27 +11,27 @@ const path = require('path');
 
 // Setup environment FIRST
 const setupEnvironment = () => {
-  // MongoDB URI - MOST CRITICAL
+  // MongoDB URI - MUST be provided via environment variables
   if (!process.env.MONGODB_URI) {
-    process.env.MONGODB_URI = 'mongodb+srv://Jitendra007:Shiv%40007@cluster0.248qsfx.mongodb.net/smart-resume-db?retryWrites=true&w=majority';
-    console.log('⚠️ Using default MONGODB_URI');
+    console.error('❌ CRITICAL: MONGODB_URI environment variable not set!');
+    console.error('Please set MONGODB_URI in Railway Variables or .env file');
+    process.exit(1);
   }
 
-  // JWT Secret
+  // JWT Secret - MUST be provided
   if (!process.env.JWT_SECRET) {
-    process.env.JWT_SECRET = 'railway-production-secret-key-12345-change-this';
-    console.log('⚠️ Using default JWT_SECRET');
+    console.error('❌ CRITICAL: JWT_SECRET environment variable not set!');
+    process.exit(1);
   }
 
   // JWT Expiration
   if (!process.env.JWT_EXPIRE) {
     process.env.JWT_EXPIRE = '7d';
-    console.log('⚠️ Using default JWT_EXPIRE');
   }
 
   // Environment
   if (!process.env.NODE_ENV) {
-    process.env.NODE_ENV = 'production';
+    process.env.NODE_ENV = 'development';
   }
 
   // Port
@@ -41,7 +41,7 @@ const setupEnvironment = () => {
 
   // Serve Frontend
   if (!process.env.SERVE_FRONTEND) {
-    process.env.SERVE_FRONTEND = 'true';
+    process.env.SERVE_FRONTEND = 'false';
   }
 
   console.log('✅ Environment configured:');
@@ -50,7 +50,6 @@ const setupEnvironment = () => {
   console.log('   - MONGODB_URI: ✅ Configured');
   console.log('   - JWT_SECRET: ✅ Configured');
   console.log('   - JWT_EXPIRE:', process.env.JWT_EXPIRE);
-  console.log('   - SERVE_FRONTEND:', process.env.SERVE_FRONTEND);
 };
 
 setupEnvironment();
